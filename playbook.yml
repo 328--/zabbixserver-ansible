@@ -1,7 +1,9 @@
 ---
 - hosts: all
-  user: 
+  user: ie-user
   sudo: yes
+  vars:
+    mysql_root_password: kakikukeko
   tasks:
     - name: install zabbix
       yum: name={{ item }} state=installed
@@ -12,3 +14,13 @@
         - zabbix-web-japanese
         - zabbix-agent
         - mariadb-server
+        - MySQL-python
+
+    - name: mariadb settings
+      copy: src=server.cnf dest=/etc/my.cnf.d/server.cnf owner=root group=root mode=644
+
+    - name: MariaDB started and enabled
+      service: name=mariadb state=started enabled=yes
+
+    - name: root account settings
+      mysql_user: name=root host=localhost password="{{ mysql_root_password }}"
